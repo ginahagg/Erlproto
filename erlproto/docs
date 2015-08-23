@@ -1,0 +1,8 @@
+This project uses below open source software.
+
+
+
+Cowboy   for websocket server
+WebSocket_Client  for Websocket client
+Lager For logging
+GPB   (Google ProtoBuf implementation in erlang)
