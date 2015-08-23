@@ -1,0 +1,3 @@
+message Example {
+    required string text = 1;
+}

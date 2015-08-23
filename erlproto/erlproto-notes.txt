@@ -1,0 +1,216 @@
+curl -v http://localhost:8080/websocket -H "Upgrade: WebSocket" -H "Connection: Upgrade" -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: 123" -H "Sec-WebSocket-Protocol: sip" -H "Host: localhost" -H "Origin: http//localhost"
+
+wscat -c ws://localhost:8080/websocket
+
+cp /Users/ginahagg/mywork/sensity/erlproto/priv/static/sockettest.html /Users/ginahagg/mywork/sensity/erlproto/rel/erlproto/lib/erlproto-0.1.0/priv/static
+
+do rebar generate from rel directory.
+
+libdirs ["../","../deps"]   should find the src files
+
+to run:rel/erlproto/bin/erlproto console
+
+protobuffs_compile(message.proto)
+
+message:encode_msg({'person', <<"Nick">>, <<"Mountain View">>, <<"+1 (000) 555-1234">>, 25, undefined}).
+
+creates a message_pb.erl file
+message_pb.hrl but in rel/erlproto
+copy manually to rel/erlproto/lib/erlproto/ebin directory both of them and put hrl in include
+
+Encoded = message_pb:encode([
+    {person, <<"Nick">>, <<"Mountain View">>, <<"+1 (000) 555-1234">>, 25, undefined},
+    {person, <<"Jill">>, <<"Denver">>, <<"+1 (000) 555-4321">>, 29, undefined}
+]).
+[[42,
+  [[["\n",[4],<<"Nick">>],
+    [[18],"\r",<<"Mountain View">>],
+    [[26],[17],<<"+1 (000) 555-1234">>],
+    [" ",[25]],
+    []]]],
+ [35,
+  [[["\n",[4],<<"Jill">>],
+    [[18],[6],<<"Denver">>],
+    [[26],[17],<<"+1 (000) 555-4321">>],
+    [" ",[29]],
+    []]]]]
+
+2. make it binary from iolist
+IEnc = iolist_to_binary(Encoded).
+message_pb:delimited_decode_person(IEnc).  
+gives below
+{[{person,"Nick","Mountain View","+1 (000) 555-1234",25,
+          undefined},
+  {person,"Jill","Denver","+1 (000) 555-4321",29,undefined}],
+ <<>>}5
+
+
+    P = message_pb:encode_person({person, <<"Nick">>, <<"Mountain View">>,
+    <<"+1 (000) 555-1234">>,25, undefined}).
+
+    %%P is iolist, make it a binary
+    I = iolist_to_binary(P).
+
+    %% this has to be binary
+    message_pb:decode_person(I).
+
+------------------------------GPB ---------------
+StatusMsg = otmp_server_proto:encode_msg({conn_status, %name of message
+                                            connected,  % connstatus required
+                                            "d34db33f",  %session id required
+                                            "Welcome to OTMPd!"}), %msg optional
+
+  message Person {
+    required string name = 1;
+    required string address = 2;
+    required string phone_number = 3;
+    required int32 age = 4;
+    optional Location location = 5;
+}
+
+message Short{
+  required string name = 1;
+  optional email = 2;
+}
+
+EShort = message:encode_msg({'Short',<<"Nick">>, undefined}).
+<<10,4,78,105,99,107>>
+DShort = short:decode_msg(EShort,'Short').
+{'Short',"Nick",undefined}
+
+websocket! {<<"Short">>,<<10,4,78,105,99,107>>}.
+
+EPerson = message:encode_msg({'Person',<<"Nick">>, <<"Mountain View">>,
+    <<"+1 (000) 555-1234">>, 25, undefined}).
+
+comes out as
+<<10,4,78,105,99,107,18,13,77,111,117,110,116,97,105,110,
+  32,86,105,101,119,26,17,43,49,32,40,48,48,...>>
+
+
+then to decode it
+
+message:decode_msg(EPerson,'Person').
+{'Person',"Nick","Mountain View","+1 (000) 555-1234",25,
+          undefined}
+	  
+    -----------------------META PROTO -----------------------------
+
+
+ 1.      EShort = short:encode_msg({short,<<"Nick">>, undefined}). 
+         <<10,4,78,105,99,107>> 
+
+ 2.       EMeta = meta_proto:encode_msg({meta,short,EShort}).
+          <<8,5,18,6,10,4,78,105,99,107>>
+
+ 3.      DMeta = meta_proto:decode_msg(EMeta,meta).  
+        {meta,short,<<10,4,78,105,99,107>>}
+
+
+(proto_test@Gina-Haggs-MacBook-Pro)7> application:ensure_all_started(gun).
+{ok,[ranch,crypto,cowlib,public_key,ssl,gun]}
+(proto_test@Gina-Haggs-MacBook-Pro)8> {ok,Cpid} = gun:open("localhost",8080).
+{ok,<0.72.0>}
+(proto_test@Gina-Haggs-MacBook-Pro)9> {ok,Protocol} = gun:await_up(Cpid).
+{ok,http}
+(proto_test@Gina-Haggs-MacBook-Pro)10> gun:ws_upgrade(C, "/websocket").   
+#Ref<0.0.0.222>
+(proto_test@Gina-Haggs-MacBook-Pro)11> gun:ws_send(C,[{binary,<<8,5,18,6,10,4,78,105,99,107>>}]).
+gun:ws_send(C,[{text,"hello"}]).
+
+gun:ws_send(C, [
+  {text, "Hello!"},
+  {binary, <<8,5,18,6,10,4,78,105,99,107>>},
+  close
+]).
+ok
+ok
+(proto_test@Gina-Haggs-MacBook-Pro)12> gun:ws_send(Cpid,[{binary,<<8,5,18,6,10,4,78,105,99,107>>}]).
+ok
+(proto_test@Gina-Haggs-MacBook-Pro)13> 
+
+SQUARE
+math_calcul:encode_msg({areaofsquare,<<"areaofsquare">>,2, undefined,<<"sqft">>}).
+ASq2 = <<10,12,97,114,101,97,111,102,115,113,117,97,114,101,16,2,34,4,115,113,102,116>> 
+
+EncASq2 = math_calcul:decode_msg(ASq2,areaofsquare).  
+{areaofsquare,"areaofsquare",2,undefined,"sqft"}
+
+match_calcul:decode_msg(<<10,12,97,114,101,97,111,102,115,113,117,97,114,101,16,2,34,4,115,113,102,116>>,areaofsquare).
+
+
+RECTANGLE
+ARect2 = math_calcul:encode_msg({areaofrectangle,<<"areaofrectangle">>,2, 4, undefined,<<"sqft">>}).
+<<10,15,97,114,101,97,111,102,114,101,99,116,97,110,103,108,101,16,2,24,4,42,4,115,113,102,116>>
+
+EncRectSq2 = math_calcul:decode_msg(ARect2,areaofrectangle).  
+{areaofrectangle,"areaofrectangle",2, 4, undefined,"sqft"}
+
+EncRectSq2 = math_calcul:decode_msg(ARect2,areaofrectangle).              
+{areaofrectangle,"areaofrectangle",2,4,undefined,"sqft"}
+
+match_calcul:decode_msg(<<10,12,97,114,101,97,111,102,115,113,117,97,114,101,16,2,34,4,115,113,102,116>>,areaofrectangle).
+
+FACTORIAL
+  F1 = math_calcul:encode_msg({factorial,<<"factorial">>,4,undefined}).
+<<10,9,102,97,99,116,111,114,105,97,108,16,4>>
+MetaF1 = meta_proto:encode_msg({meta,factorial,F1}).
+<<8,9,18,13,10,9,102,97,99,116,111,114,105,97,108,16,4>>
+
+L=meta_proto:decode_msg({<<10,15,97,114,101,97,111,102,114,101,99,116,97,110,103,108,101,16,2,24,4,42,4,115,113,102,116>>,meta}).
+<<10,15,97,114,101,97,111,102,114,101,99,116,97,110,103,108,101,16,2,24,4,42,4,115,113,102,116>>
+<<8,9,18,13,10,9,102,97,99,116,111,114,105,97,108,16,4>>
+
+
+AFac4 = math_calcul:encode_msg({factorial,<<"factorial">>,4, undefined}).
+ <<10,9,102,97,99,116,111,114,105,97,108,16,4>> 
+
+EncFac4 = math_calcul:decode_msg(AFac4,factorial).  
+{areaofsquare,"areaofsquare",2,undefined,"sqft"}
+
+match_calcul:decode_msg(<<10,12,97,114,101,97,111,102,115,113,117,97,114,101,16,2,34,4,115,113,102,116>>,factorial).
+
+
+ F1 = math_calcul:encode_msg({factorial,<<"factorial">>,2, 2}).             <<10,9,102,97,99,116,111,114,105,97,108,16,2,24,2>>
+(proto_test@Gina-Haggs-MacBook-Pro)6> MF1 = meta_proto:encode_msg({meta,factorial,F1}).
+<<8,9,18,15,10,9,102,97,99,116,111,114,105,97,108,16,2,24,2>>
+
+
+
+
+
+META
+meta_proto:encode_msg({meta,math_calcul,<<10,9,102,97,99,116,111,114,105,97,108,16,4>>}).
+
+meta_proto:encode_msg({meta,math_calcul,
+<<10,26,83,104,97,105,108,97,32,105,115,32,78,105,99,107,115,32,103,105,114,108,102,114,105,101,110,100,18,20,108,111,118,101,108,121,103,105,114,108,64,121,97,104,111,111,46,99,111,109>>).
+lovelygirl stuff
+
+
+
+M2 = meta_proto:decode_msg(<<10,15,97,114,101,97,111,102,114,101,99,116,97,110,103,108,101,16,2,24,4,42,4,115,113,102,116>>,meta).
+
+
+** Websocket handler simple terminating
+** for the reason {handler,function_clause}
+** Handler state was 2
+** Stacktrace: [{proto_handler,handle_decoded,
+                               [factorial,{factorial,"factorial",2,2}],
+                               [{file,"src/proto_handler.erl"},{line,5}]},
+                {simple,websocket_handle,3,
+                        [{file,"src/simple.erl"},{line,44}]},
+                {websocket_client,retrieve_frame,6,
+                                  [{file,"src/websocket_client.erl"},
+                                   {line,384}]},
+                {proc_lib,init_p_do_apply,3,
+                          [{file,"proc_lib.erl"},{line,237}]}]
+
+** exception error: {handler,function_clause}
+
+
+Q = <<10,9,102,97,99,116,111,114,105,97,108,16,2,24,2>>.
+<<10,9,102,97,99,116,111,114,105,97,108,16,2,24,2>>
+(erlproto@127.0.0.1)2> protobuf_handler:handle_msg(factorial,Q).
+
+
+<<8,9,18,15,10,9,102,97,99,116,111,114,105,97,108,16,4,24,0>>
