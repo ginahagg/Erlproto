@@ -1,64 +1,43 @@
 -module(proto_handler).
--export([handle_decoded/2,handle_msg/2]).
-
-handle_msg(areaofsquare, Bin) ->
-    Dcoded = math_calcul:decode_msg(Bin, areaofsquare),
-    io:format("Dcoded: ~p ~n",[Dcoded]),
-    handle_decoded(areaofsquare,Dcoded);
-
-handle_msg(areaofrectangle, Bin) ->
-    Dcoded = math_calcul:decode_msg(Bin, areaofrectangle),
-    io:format("Dcoded: ~p ~n",[Dcoded]),
-    handle_decoded(areaofrectangle,Dcoded);
+-compile(export_all).
+-compile([{parse_transform, lager_transform}]).
 
 handle_msg(factorial, Bin) ->
     Dcoded = math_calcul:decode_msg(Bin, factorial),
-    io:format("Dcoded: ~p ~n",[Dcoded]),
+    lager:info("Dcoded: ~p ~n",[Dcoded]),
     handle_decoded(factorial,Dcoded);
 
-handle_msg(short,Bin) ->
-    Dcoded = short:decode_msg(Bin,short),
-    io:format("Dcoded: ~p ~n",[Dcoded]),
-    handle_decoded(short,Dcoded);
 
 handle_msg(_MsgName, Bin) ->
-    io:format("I am not interested in this message: ~p~n", [Bin]),
+    lager:info("I am not interested in this message: ~p~n", [Bin]),
     %erlang:error(stop_sending_me_garbage),
     <<"stop_sending_me_garbage">>.
 
-handle_decoded(short,Dcoded) when is_list(Dcoded) ->
-    [handle_decoded(short,M) || M <- Dcoded];
-
-handle_decoded(short,{_Mod, Name, _Email}) ->
-    Name;
-
-handle_decoded(areaofsquare,Dcoded) when is_list(Dcoded) ->
-    [handle_decoded(areaofsquare,M) || M <- Dcoded];
-
-handle_decoded(areaofsquare,{_Name, Length, Area, Unit}) ->
-     Len4NextQ = Length + 5,
-     math_calcul:encode_msg({areaofsquare,<<"areaofsquare">>, Len4NextQ , 0,Unit});
-    
-
-handle_decoded(areaofrectangle,Dcoded) when is_list(Dcoded) ->
-    [handle_decoded(areaofrectangle,M) || M <- Dcoded];
-
-handle_decoded(areaofrectangle,{_Name, Length, Width, Area, Unit}) ->
-    Len4NextQ = Length + 5,
-    Wid4NextQ = Width + 5,
-    math_calcul:encode_msg({areaofrectangle,<<"areaofrectangle">>,Len4NextQ,Wid4NextQ, 0,Unit});
+decode_nested_message(factorial, Bin) ->
+    Decoded = math_calcul:decode_msg(Bin, factorial),
+    lager:info("Decoded: ~p ~n",[Decoded]),
+    Decoded.
 
 handle_decoded(factorial, Dcoded) when is_list(Dcoded) ->
     [handle_decoded(factorial,M) || M <- Dcoded];
 
-handle_decoded(factorial,{factorial,Name, Number, Result}) when Number < 50 ->
+handle_decoded(factorial,{factorial,Name, Number, Result}) when Number < 20 ->
      %Prepare next factorial question. Add 2 to prev number.
-     NextNumber = Number + 2,
-     io:format("NextNumber: ~p",[NextNumber]),
+     lager:info("server answer: factorial of ~p is ~p~n",[Number,Result]),
+     NextNumber = Number + 1,
+     lager:info("NextNumber: ~p",[NextNumber]),
      NextQ = math_calcul:encode_msg({factorial,Name,NextNumber, 0}),
-     io:format("NextQ: ~p~n",[NextQ]),
+     lager:info("NextQ: ~p~n",[NextQ]),
      NextQ;
 
-%if Number reached 50, we will stop sending.
+%%if Number reached 20, we will stop sending.
 handle_decoded(factorial,{factorial,_Name, _Number, _Result}) ->
      no_more_questions.
+
+encodeFactorialMessage(Number) ->   
+    Q = math_calcul:encode_msg({factorial,<<"factorial">>,Number, 0}),
+    lager:info("Encoded: {factorial,<<\"factorial\">>,~p, 0} = ~p~n",[Number,Q]),
+    M = meta_proto:encode_msg({meta,factorial,Q}),
+    lager:info("Encoded with meta for final sendoff: ~p~n",[M]),
+    M.
+
