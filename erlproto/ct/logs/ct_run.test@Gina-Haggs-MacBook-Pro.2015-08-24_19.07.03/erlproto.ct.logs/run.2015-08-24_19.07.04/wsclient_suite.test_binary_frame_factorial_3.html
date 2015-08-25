@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Test wsclient_SUITE:test_binary_frame_factorial_3 result</title>
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="../../ct_default.css" type="text/css">
+<script type="text/javascript" src="../../jquery-latest.js"></script>
+<script type="text/javascript" src="../../jquery.tablesorter.min.js"></script>
+</head>
+<body>
+
+<a name="top"></a><pre>
+=== Test case: wsclient_SUITE:test_binary_frame_factorial_3/1
+
+=== Config value:
+
+    [{watchdog,<0.125.0>},
+     {tc_logfile,"/Users/ginahagg/mywork/homework/erlproto/ct/logs/ct_run.test@Gina-Haggs-MacBook-Pro.2015-08-24_19.07.03/erlproto.ct.logs/run.2015-08-24_19.07.04/wsclient_suite.test_binary_frame_factorial_3.html"},
+     {tc_group_properties,[]},
+     {tc_group_path,[]},
+     {data_dir,"/Users/ginahagg/mywork/homework/erlproto/ct/wsclient_SUITE_data/"},
+     {priv_dir,"/Users/ginahagg/mywork/homework/erlproto/ct/logs/ct_run.test@Gina-Haggs-MacBook-Pro.2015-08-24_19.07.03/erlproto.ct.logs/run.2015-08-24_19.07.04/log_private/"}]
+
+=== Current directory is "/Users/ginahagg/mywork/homework/erlproto/ct/logs/ct_run.test@Gina-Haggs-MacBook-Pro.2015-08-24_19.07.03"
+
+=== Started at 2015-08-24 19:07:04
+
+<br />
+
+<div class="sasl"><b>*** System report during wsclient_SUITE:test_binary_frame_factorial_3/1 2015-08-24 19:07:04.954 ***</b>
+
+=PROGRESS REPORT==== 24-Aug-2015::19:07:04 ===
+          supervisor: {local,inet_gethost_native_sup}
+             started: [{pid,<0.136.0>},{mfa,{inet_gethost_native,init,[[]]}}]
+
+</div>
+
+<div class="sasl"><b>*** System report during wsclient_SUITE:test_binary_frame_factorial_3/1 2015-08-24 19:07:04.955 ***</b>
+
+=PROGRESS REPORT==== 24-Aug-2015::19:07:04 ===
+          supervisor: {local,kernel_safe_sup}
+             started: [{pid,<0.135.0>},
+                       {name,inet_gethost_native_sup},
+                       {mfargs,{inet_gethost_native,start_link,[]}},
+                       {restart_type,temporary},
+                       {shutdown,1000},
+                       {child_type,worker}]
+
+</div>
+
+<div class="info"><b>*** User 2015-08-24 19:07:04.984 ***</b>
+Sending to server: <<8,9,18,15,10,9,102,97,99,116,111,114,105,97,108,16,3,24,0>>
+
+</div>
+
+<div class="sasl"><b>*** System report during wsclient_SUITE:test_binary_frame_factorial_3/1 2015-08-24 19:07:05.002 ***</b>
+
+=PROGRESS REPORT==== 24-Aug-2015::19:07:05 ===
+          supervisor: {local,kernel_safe_sup}
+             started: [{pid,<0.139.0>},
+                       {name,dets_sup},
+                       {mfargs,{dets_sup,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,1000},
+                       {child_type,supervisor}]
+
+</div>
+
+<div class="sasl"><b>*** System report during wsclient_SUITE:test_binary_frame_factorial_3/1 2015-08-24 19:07:05.003 ***</b>
+
+=PROGRESS REPORT==== 24-Aug-2015::19:07:05 ===
+          supervisor: {local,kernel_safe_sup}
+             started: [{pid,<0.140.0>},
+                       {name,dets},
+                       {mfargs,{dets_server,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+</div>
+
+<div class="info"><b>*** User 2015-08-24 19:07:05.018 ***</b>
+should be empty
+
+</div>
+
+<div class="info"><b>*** User 2015-08-24 19:07:05.025 ***</b>
+first payload: [{payload,<<8,9,18,15,10,9,102,97,99,116,111,114,105,97,108,
+                           16,3,24,6>>}]
+
+</div>
+
+<div class="info"><b>*** User 2015-08-24 19:07:05.025 ***</b>
+Recieved from server: <<8,9,18,15,10,9,102,97,99,116,111,114,105,97,108,16,3,
+                        24,6>>
+
+</div>
+
+<div class="info"><b>*** User 2015-08-24 19:07:05.026 ***</b>
+Server sent answer: factorial:<<10,9,102,97,99,116,111,114,105,97,108,16,3,24,6>>
+
+</div>
+
+<div class="info"><b>*** User 2015-08-24 19:07:05.026 ***</b>
+after final decoding factorial of 3 should be 6 from shown in 4 element of the tuple. {factorial,
+                                                                                       "factorial",
+                                                                                       3,
+                                                                                       6}
+
+</div>
+
+<div class="ct_error_notify"><b>*** CT Error Notification 2015-08-24 19:07:05.027 ***</b>
+wsclient:cleanup_storage failed
+Reason: undef
+
+<a href="#end">Full error description and stacktrace</a>
+</div>
+<a name="end"></a>
+
+
+=== Ended at 2015-08-24 19:07:05
+=== location [{wsclient,cleanup_storage},
+ {wsclient_SUITE,test_binary_frame_factorial_3,72},
+ {test_server,ts_tc,1429},
+ {test_server,run_test_case_eval1,1026},
+ {test_server,run_test_case_eval,968}]
+=== reason = undefined function wsclient:cleanup_storage/0
+  in function  wsclient_SUITE:test_binary_frame_factorial_3/1 (wsclient_SUITE.erl, line 72)
+  in call from test_server:ts_tc/3 (test_server.erl, line 1429)
+  in call from test_server:run_test_case_eval1/6 (test_server.erl, line 1026)
+  in call from test_server:run_test_case_eval/9 (test_server.erl, line 968)
+</pre>
+<center>
+<br /><hr /><p>
+<a href="../../../all_runs.html">Test run history
+</a>  |  <a href="../../../index.html">Top level test index
+</a>
+</p>
+<div class="copyright">Copyright &copy; 2015 <a href="http://www.erlang.org">Open Telecom Platform</a><br />
+Updated: <!date>Mon Aug 24 2015 19:07:04<!/date><br />
+</div>
+</center>
+</body>
+</html>

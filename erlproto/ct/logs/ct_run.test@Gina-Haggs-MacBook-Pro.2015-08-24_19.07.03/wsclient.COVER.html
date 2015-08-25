@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>/Users/ginahagg/mywork/homework/erlproto/ct/logs/ct_run.test@Gina-Haggs-MacBook-Pro.2015-08-24_19.07.03/wsclient.COVER.html</title>
+</head><body style='background-color: white; color: black'>
+<pre>
+File generated from /Users/ginahagg/mywork/homework/erlproto/ct/wsclient.erl by COVER 2015-08-24 at 19:07:05
+
+****************************************************************************
+
+        |  -module(wsclient).
+        |  
+        |  -behaviour(websocket_client_handler).
+        |  
+        |  -export([
+        |           start_link/0,
+        |           start_link/1,
+        |           start_link/2,
+        |           send_text/2,
+        |           send_binary/2,
+        |           send_ping/2,
+        |           recv/2,
+        |           recv/1,
+        |           stop/1,
+        |           encode_msg_for_sendoff/1,
+        |           decode_payload/1,
+        |           handle_binary/1,
+        |           fetch_last_received/0,
+        |           cleanup_store/0
+        |          ]).
+        |  
+        |  -export([
+        |           init/2,
+        |           websocket_handle/3,
+        |           websocket_info/3,
+        |           websocket_terminate/3
+        |          ]).
+        |   
+        |  -record(state, {
+        |            buffer = [] :: list(),
+        |            waiting = undefined :: undefined | pid()
+        |           }).
+        |  -define(NumOfMsgsToBeTransmitted,1).
+        |  
+        |  -compile([{parse_transform, lager_transform}]).
+        |  
+        |  %start communication by sending this factorial question below. Server will parse and send us an answer.
+        |  %factorial of 2 = {meta,factorial,{factorial,2,0}    
+        |  -define(Start,&lt;&lt;8,9,18,15,10,9,102,97,99,116,111,114,105,97,108,16,4,24,0&gt;&gt;).
+        |  
+        |  start_link() -&gt;
+<font color=red>     0..|      start_link("ws://localhost:8080/websocket").</font>
+        |  
+        |  start_link(Url) -&gt;
+<font color=red>     0..|      application:start(sasl),</font>
+<font color=red>     0..|      lager:start(),</font>
+<font color=red>     0..|      {ok,Pid} = websocket_client:start_link(Url, ?MODULE, []),</font>
+<font color=red>     0..|      send_binary(Pid,?Start),</font>
+<font color=red>     0..|      {ok, Pid}.</font>
+        |  
+        |  %%for common_test don't start the dialog.
+        |  start_link(Url,test) -&gt;
+     1..|      {ok,_Pid} = websocket_client:start_link(Url, ?MODULE, []).
+        |      
+        |  
+        |  stop(Pid) -&gt;
+<font color=red>     0..|      Pid ! stop.</font>
+        |  
+        |  send_text(Pid, Msg) -&gt;
+<font color=red>     0..|      websocket_client:cast(Pid, {text, Msg}).</font>
+        |  
+        |  send_binary(Pid, Msg) -&gt;
+     1..|      lager:info("Sending binary msg: ~p~n",[Msg]),
+     1..|      websocket_client:cast(Pid, {binary, Msg}).
+        |  
+        |  send_ping(Pid, Msg) -&gt;
+<font color=red>     0..|      websocket_client:cast(Pid, {ping, Msg}).</font>
+        |  
+        |  recv(Pid) -&gt;
+<font color=red>     0..|      recv(Pid, 5000).</font>
+        |  
+        |  recv(Pid, Timeout) -&gt;
+<font color=red>     0..|      Pid ! {recv, self()},</font>
+<font color=red>     0..|      receive</font>
+<font color=red>     0..|          M -&gt; lager:info("receive:M is ~p~n",[M]), </font>
+<font color=red>     0..|          M</font>
+        |      after
+<font color=red>     0..|          Timeout -&gt; error</font>
+        |      end.
+        |  
+        |  init(_, _WSReq) -&gt;
+        |      %ets:new(?MODULE,[public, named_table]),
+     1..|      {ok, #state{}}.
+        |  
+        |  stop_if_lastone(no_more_questions) -&gt;
+<font color=red>     0..|      send_text(self(),&lt;&lt;"no_more_questions"&gt;&gt;),</font>
+<font color=red>     0..|      {close, &lt;&lt;"Finished transmitting. Closing Shop"&gt;&gt;, []};</font>
+        |  
+        |  stop_if_lastone(Resp) -&gt;
+     1..|      lager:info("after sleeping for a second, sending binary:~p to selfpid ~p ~n",[Resp, self()]), 
+     1..|      timer:sleep(1000),     
+<font color=red>     0..|      send_binary(self(), Resp).</font>
+        |  
+        |                  
+        |  send_binary_frame({binary,Bin}, BufferLength) when BufferLength &lt; ?NumOfMsgsToBeTransmitted -&gt; 
+     1..|      store_payload(Bin),
+     1..|      Resp = handle_binary(Bin),
+     1..|      stop_if_lastone(Resp);
+        |   
+        |  send_binary_frame({binary,_},_BufferLength) -&gt;
+<font color=red>     0..|      stop_if_lastone(no_more_questions);   </font>
+        |  
+        |  send_binary_frame({text,_}, _) -&gt;
+<font color=red>     0..|      lager:info("we probably got server's garbage message."),</font>
+<font color=red>     0..|      not_handling_text.</font>
+        |  
+        |  store_payload(Bin) -&gt;
+     1..|      {ok,Ref} = dets:open_file(?MODULE,[]),  
+     1..|      dets:insert(Ref,{payload,Bin}),
+     1..|      dets:close(Ref).
+        |  
+        |  cleanup_store() -&gt;
+<font color=red>     0..|      {ok,Ref} = dets:open_file(?MODULE,[]), </font>
+<font color=red>     0..|      dets:delete_all_objects(Ref),</font>
+<font color=red>     0..|      dets:close(Ref).</font>
+        |   
+        |  fetch_last_received() -&gt;
+     2..|      {ok,Ref} = dets:open_file(?MODULE,[]),  
+     2..|      Payload = dets:lookup(Ref,payload),
+     2..|      dets:close(Ref),
+     2..|      Payload.
+        |  
+        |  websocket_handle(Frame, _, State = #state{waiting = undefined, buffer = Buffer}) -&gt;
+     1..|      lager:info("1.Client received frame ~p ~n",[Frame]),
+     1..|      BufferLength = length(Buffer),
+     1..|      lager:info("We have ~p items in buffer.",[BufferLength]),
+        |      %store_payload(Frame),
+     1..|      send_binary_frame(Frame, BufferLength),
+<font color=red>     0..|      {ok, State#state{buffer = [Frame|Buffer]}};</font>
+        |  
+        |  
+        |  websocket_handle(Frame, _, State = #state{waiting = _From}) -&gt;
+        |       %send_binary_frame(Frame),   
+<font color=red>     0..|       {ok, State#state{waiting = undefined}}.</font>
+        |  
+        |  websocket_info({send_text, Text}, WSReq, State) -&gt;
+<font color=red>     0..|      websocket_client:send({text, Text}, WSReq),</font>
+<font color=red>     0..|      {ok, State};</font>
+        |  websocket_info({recv, From}, _, State = #state{buffer = []}) -&gt;
+<font color=red>     0..|      {ok, State#state{waiting = From}};</font>
+        |  websocket_info({recv, From}, _, State = #state{buffer = [Top|Rest]}) -&gt;
+<font color=red>     0..|      From ! Top,</font>
+<font color=red>     0..|      {ok, State#state{buffer = Rest}};</font>
+        |  websocket_info(stop, _, State) -&gt;
+<font color=red>     0..|      {close, &lt;&lt;&gt;&gt;, State}.</font>
+        |  
+        |  websocket_terminate(Close, Reason, State) -&gt;
+<font color=red>     0..|      io:format("Websocket closed with frame ~p and reason ~p and state ~p", [Close, Reason,State]),</font>
+<font color=red>     0..|      ok.</font>
+        |  
+        |  decode_payload(Msg) -&gt;
+     1..|      {meta, MsgName, Bin} = meta_proto:decode_msg(Msg,meta),
+     1..|      lager:info("~p answer binary: ~p~n", [MsgName,Bin]),
+     1..|      {MsgName, Bin}.
+        |  
+        |  handle_binary(Msg)-&gt;
+     1..|      lager:info("recvd binary: ~p~n", [Msg]),
+     1..|      {meta, MsgName, Bin} = meta_proto:decode_msg(Msg,meta),
+     1..|      lager:info("~p answer binary: ~p~n", [MsgName,Bin]),
+     1..|      NextQuestion = (catch proto_handler:handle_msg(MsgName,Bin)),
+     1..|      lager:info("~p:NextQuestion: ~p~n", [MsgName,NextQuestion]),
+     1..|      Send = case NextQuestion of 
+<font color=red>     0..|          no_more_questions -&gt; no_more_questions;</font>
+     1..|          _-&gt; meta_proto:encode_msg({meta,MsgName,NextQuestion})
+        |      end,
+     1..|      lager:info("~p:Send: ~p~n", [MsgName,Send]), 
+     1..|      Send.
+        |  
+        |  encode_msg_for_sendoff(Number) -&gt;
+     1..|      proto_handler:encodeFactorialMessage(Number).  
+        |      </pre>
+</body>
+</html>

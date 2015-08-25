@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>/Users/ginahagg/mywork/homework/erlproto/ct/logs/ct_run.test@Gina-Haggs-MacBook-Pro.2015-08-24_19.07.40/proto_handler.COVER.html</title>
+</head><body style='background-color: white; color: black'>
+<pre>
+File generated from /Users/ginahagg/mywork/homework/erlproto/ct/proto_handler.erl by COVER 2015-08-24 at 19:07:41
+
+****************************************************************************
+
+        |  -module(proto_handler).
+        |  -compile(export_all).
+        |  -compile([{parse_transform, lager_transform}]).
+        |  
+        |  -define(LastNumber,3).
+        |  
+        |  handle_msg(factorial, Bin) -&gt;
+     1..|      Dcoded = math_calcul:decode_msg(Bin, factorial),
+     1..|      lager:info("Dcoded: ~p ~n",[Dcoded]),
+     1..|      handle_decoded(factorial,Dcoded);
+        |  
+        |  
+        |  handle_msg(_MsgName, Bin) -&gt;
+<font color=red>     0..|      lager:info("I am not interested in this message: ~p~n", [Bin]),</font>
+        |      %erlang:error(stop_sending_me_garbage),
+<font color=red>     0..|      &lt;&lt;"stop_sending_me_garbage"&gt;&gt;.</font>
+        |  
+        |  %%for testing
+        |  decode_nested_message(factorial, Bin) -&gt;
+     1..|      Decoded = math_calcul:decode_msg(Bin, factorial),
+     1..|      lager:info("Decoded: ~p ~n",[Decoded]),
+     1..|      Decoded.
+        |  
+        |  handle_decoded(factorial, Dcoded) when is_list(Dcoded) -&gt;
+<font color=red>     0..|      [handle_decoded(factorial,M) || M &lt;- Dcoded];</font>
+        |  
+        |  handle_decoded(factorial,{factorial,Name, Number, Result}) -&gt;
+        |       %Prepare next factorial question. Add 2 to prev number.
+     1..|       lager:info("server answer: factorial of ~p is ~p~n",[Number,Result]),
+     1..|       NextNumber = Number + 1,
+     1..|       lager:info("NextNumber: ~p",[NextNumber]),
+     1..|       NextQ = math_calcul:encode_msg({factorial,Name,NextNumber, 0}),
+     1..|       lager:info("NextQ: ~p~n",[NextQ]),
+     1..|       NextQ.
+        |  
+        |  %%if Number reached 20, we will stop sending.
+        |  %handle_decoded(factorial,{factorial,_Name, Number, Result}) -&gt;
+        |  %     lager:info("server answer: factorial of ~p is ~p~n",[Number,Result]),
+        |  %     lager:info("no more questions.~n"),
+        |  %     no_more_questions.
+        |  
+        |  
+        |  %%for testing
+        |  encodeFactorialMessage(Number) -&gt;   
+     1..|      Q = math_calcul:encode_msg({factorial,&lt;&lt;"factorial"&gt;&gt;,Number, 0}),
+     1..|      lager:info("Encoded: {factorial,&lt;&lt;\"factorial\"&gt;&gt;,~p, 0} = ~p~n",[Number,Q]),
+     1..|      M = meta_proto:encode_msg({meta,factorial,Q}),
+     1..|      lager:info("Encoded with meta for final sendoff: ~p~n",[M]),
+     1..|      M.
+        |  
+</pre>
+</body>
+</html>

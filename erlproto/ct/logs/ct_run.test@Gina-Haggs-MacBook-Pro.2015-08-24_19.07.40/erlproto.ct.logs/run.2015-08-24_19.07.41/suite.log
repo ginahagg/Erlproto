@@ -1,0 +1,36 @@
+=== Suite started at 2015-08-24 19:07:41
+=== Starting test, 1 test cases
+=cases         1
+=user          ginahagg
+=host          Gina-Haggs-MacBook-Pro
+=hosts         Gina-Haggs-MacBook-Pro 
+=emulator_vsn  6.4
+=emulator      beam
+=otp_release   17
+=started       2015-08-24 19:07:41
+=case          wsclient_SUITE:init_per_suite
+=logfile       wsclient_suite.init_per_suite.html
+=started       2015-08-24 19:07:41
+=ended         2015-08-24 19:07:41
+=result        ok
+=elapsed       0.046674
+=case          wsclient_SUITE:test_binary_frame_factorial_3
+=logfile       wsclient_suite.test_binary_frame_factorial_3.html
+=started       2015-08-24 19:07:41
+=ended         2015-08-24 19:07:41
+=result        ok
+=elapsed       0.104453
+=case          wsclient_SUITE:end_per_suite
+=logfile       wsclient_suite.end_per_suite.html
+=started       2015-08-24 19:07:41
+=ended         2015-08-24 19:07:41
+=result        ok
+=elapsed       5.0e-6
+=group_time    0.229s
+=== TEST COMPLETE, 1 ok, 0 failed of 1 test cases
+
+=finished      2015-08-24 19:07:41
+=failed        0
+=successful    1
+=user_skipped  0
+=auto_skipped  0
