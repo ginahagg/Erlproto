@@ -1,0 +1,99 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww17520\viewh11120\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 \
+
+\fs28 \
+There are two projects under Homework.\
+\
+
+\b Erlproto -> Websocket Server project using Cowboy
+\b0 \
+\
+
+\b erlproto websocket_handler
+\b0  receives 
+\b gpb
+\b0  binary coded protobuf questions and answers them in 
+\b gpb
+\b0  binary coded format.\
+Questions are factorial questions. Client asks for the factorial of a number. Server calculates and gives the answer.\
+This project has Common_Test test for functional testing and Eunit tests.\
+Uses GPB open source project for ProtoBuf handling.\
+\
+
+\b To start server
+\b0  ->   
+\b ./start_server.sh
+\b0 \
+\
+
+\b To start common_tests
+\b0   -> 
+\b ./start_common_tests.sh
+\b0 \
+Common_Test modules are under root/ct directory.\
+It uses wsclient.erl from Wsclient project.\
+./start_common_tests.sh starts the Erlproto web socket server and runs the tests from wsclient_SUITE using wsclient.erl from the wsclient project. It has only one test. It sends a factorial question encoded with GPB. Server gives the answer encoded with GPB. The encoded answer is decoded and compared to the answer we should be getting.\
+Question asked is factorial of 3.\
+Server should send 6.\
+\
+\
+
+\b To start Eunit tests
+\b0  -> 
+\b ./start_eunit_tests.sh
+\b0 \
+Eunit tests are used to test the function calls Websocket_handler uses to decode and encode messages. Most decoding and encoding is handed off to protobuf_handler module. Both module functions are tested in Eunit tests. It follows the flow of Server receiving a question, decoding it, and encoding the answer.\
+\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+\
+\
+
+\b Wsclient -> Websocket Client project using Websocket_Client open source.
+\b0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 Uses GPB open source project for ProtoBuf handling.\
+wsclient project doesn\'92t have common tests. However wsclient.erl is used for common_test testing on erlproto project.\
+\
+
+\b To start wsclient
+\b0  ->  
+\b ./start.sh
+\b0 \
+\
+Once the erlang shell starts,\
+
+\b To see server - client interaction
+\b0  ->    
+\b wsclient:start_link().\
+
+\b0 \
+When this runs, it will run up to a given number of messages define in
+\b  wsclient.erl
+\b0  as \
+-define(NumOfMsgsToBeTransmitted,15).  This is maximum transmission count.\
+\
+
+\b wsclient
+\b0  receives answer from the server, and adds one to the previous factorial question, and sends it as a question to the websocket server..\
+so, basically it will send factorial questions for 2,3,4,5,6,7,8,9,10 etc\'85. till it reaches maximum transmission count. \
+After it completes NumOfMsgsToBeTransmitted (i.e sends 15 questions and get answers), wsclient sends a stop message to self and closes connection with the server.\
+\
+\
+
+\b To start unit tests
+\b0  -> 
+\b ./start_eunit_tests.sh
+\b0 \
+Eunit tests are used to test the function calls 
+\b wsclient
+\b0  uses to decode and encode messages. Most decoding and encoding is handed off to proto_handler module. Both module functions are tested in Eunit tests. It follows the flow of 
+\b wsclient
+\b0  receiving an answer, decoding it, and encoding the next question.\
+\
+\
+}

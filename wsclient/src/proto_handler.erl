@@ -1,18 +1,28 @@
 -module(proto_handler).
+-author("Gina Hagg <ghagg@yahoo.com").
 -compile(export_all).
 -compile([{parse_transform, lager_transform}]).
 
-handle_msg(factorial, Bin) ->
+-define(LastNumber,3).
+
+decode_answer_and_get_next_question(factorial, Bin) ->
     Dcoded = math_calcul:decode_msg(Bin, factorial),
     lager:info("Dcoded: ~p ~n",[Dcoded]),
     handle_decoded(factorial,Dcoded);
 
 
-handle_msg(_MsgName, Bin) ->
+decode_answer_and_get_next_question(_MsgName, Bin) ->
     lager:info("I am not interested in this message: ~p~n", [Bin]),
     %erlang:error(stop_sending_me_garbage),
     <<"stop_sending_me_garbage">>.
 
+decode_incoming_payload(Msg) -> 
+    lager:info("recvd binary: ~p~n", [Msg]),   
+    {meta, MsgName, DecodedAnswer} = meta_proto:decode_msg(Msg,meta),
+    lager:info("It is a ~p binary: ~p~n", [MsgName,DecodedAnswer]),
+    {meta, MsgName, DecodedAnswer}.
+   
+%%for testing
 decode_nested_message(factorial, Bin) ->
     Decoded = math_calcul:decode_msg(Bin, factorial),
     lager:info("Decoded: ~p ~n",[Decoded]),
@@ -21,19 +31,19 @@ decode_nested_message(factorial, Bin) ->
 handle_decoded(factorial, Dcoded) when is_list(Dcoded) ->
     [handle_decoded(factorial,M) || M <- Dcoded];
 
-handle_decoded(factorial,{factorial,Name, Number, Result}) when Number < 20 ->
+handle_decoded(factorial,{factorial,Name, Number, Result}) ->
      %Prepare next factorial question. Add 2 to prev number.
      lager:info("server answer: factorial of ~p is ~p~n",[Number,Result]),
      NextNumber = Number + 1,
      lager:info("NextNumber: ~p",[NextNumber]),
      NextQ = math_calcul:encode_msg({factorial,Name,NextNumber, 0}),
-     lager:info("NextQ: ~p~n",[NextQ]),
-     NextQ;
+     lager:info("NextQuestion: ~p~n",[NextQ]),
+     NextQ.
 
-%%if Number reached 20, we will stop sending.
-handle_decoded(factorial,{factorial,_Name, _Number, _Result}) ->
-     no_more_questions.
+encode_next_outgoing_question(MsgName, NextQuestion) ->
+    meta_proto:encode_msg({meta,MsgName,NextQuestion}).
 
+%%for testing
 encodeFactorialMessage(Number) ->   
     Q = math_calcul:encode_msg({factorial,<<"factorial">>,Number, 0}),
     lager:info("Encoded: {factorial,<<\"factorial\">>,~p, 0} = ~p~n",[Number,Q]),

@@ -1,6 +1,9 @@
 -module(proto_ws).
+-author("Gina Hagg <ghagg@yahoo.com").
 -compile(export_all).
 
+
+%%trying gun as websocket client. Has timeout issues in upgrade also reported by Robert Virding. Worth trying later when it is fixed.
 start() ->
 	{ok, ConnPid} = gun:open("127.0.0.1", 8080),
 	gun:ws_upgrade(ConnPid, "/websocket"),

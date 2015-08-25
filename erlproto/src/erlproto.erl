@@ -1,4 +1,5 @@
 -module(erlproto).
+-author("Gina Hagg <ghagg@yahoo.com").
 
 -export([init/3]).
 
